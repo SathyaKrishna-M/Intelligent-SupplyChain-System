@@ -1,0 +1,8 @@
+5f51763a-32e6-4b41-9a17-217aee46d4d3,2026-06-16T15:40:15.1262034,admin,ADMIN,User Login,User,U1,User logged into the system
+8bf75e50-8ae8-48df-8053-16592c4f1f78,2026-06-16T15:38:53.1438727,admin,ADMIN,User Login,User,U1,User logged into the system
+09f99c46-b71c-4c5b-8b87-0eeafd086725,2026-06-16T14:44:23.9441066,admin,ADMIN,User Login,User,U1,User logged into the system
+ad78e224-7b81-4b9f-8daa-93b1f9e7f938,2026-06-15T12:38:54.3862295,admin,ADMIN,User Login,User,U1,User logged into the system
+a63fa11d-4d0d-43ed-bfe5-ebe13f2d2de0,2026-06-15T11:55:43.5627144,admin,ADMIN,User Login,User,U1,User logged into the system
+A001,2026-06-14T09:15:00Z,admin,ADMIN,Created Order,Order,O003,Order O003 placed with S001
+A002,2026-06-14T10:00:00Z,warehouse_mgr,WAREHOUSE_MANAGER,Stock Update,Product,P001,Stock level updated in W001
+A003,2026-06-15T08:30:00Z,logistics_mgr,LOGISTICS_MANAGER,Driver Assigned,Shipment,SH002,Driver D002 assigned to SH002

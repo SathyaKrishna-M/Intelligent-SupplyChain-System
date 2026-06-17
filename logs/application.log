@@ -1,0 +1,39 @@
+[2026-06-16 15:43:38] [INFO] Seeding initial users...
+[2026-06-16 15:43:38] [INFO] Seeding initial data...
+[2026-06-16 15:43:38] [INFO] Initial data seeded.
+[2026-06-16 15:43:57] [INFO] [API] HTTP Server started on port 8081
+[2026-06-16 15:43:57] [INFO] [API] Frontend can connect at http://localhost:8081/api
+[2026-06-16 15:44:12] [INFO] Received POST request to /api/auth/login
+[2026-06-16 15:45:22] [INFO] Received POST request to /api/auth/login
+[2026-06-16 15:48:28] [INFO] Received OPTIONS request to /api/auth/login
+[2026-06-16 15:48:39] [INFO] Received OPTIONS request to /api/auth/login
+[2026-06-16 15:50:08] [INFO] [API] HTTP Server started on port 8081
+[2026-06-16 15:50:08] [INFO] [API] Frontend can connect at http://localhost:8081/api
+[2026-06-16 15:51:13] [INFO] Received OPTIONS request to /api/auth/login
+[2026-06-16 15:51:13] [INFO] Received POST request to /api/auth/login
+[2026-06-16 15:51:13] [INFO] Received OPTIONS request to /api/notifications
+[2026-06-16 15:51:13] [INFO] Received OPTIONS request to /api/activity
+[2026-06-16 15:51:13] [INFO] Received OPTIONS request to /api/dashboard
+[2026-06-16 15:51:13] [INFO] Received OPTIONS request to /api/notifications
+[2026-06-16 15:51:13] [INFO] Received GET request to /api/activity
+[2026-06-16 15:51:13] [INFO] Received GET request to /api/notifications
+[2026-06-16 15:51:13] [INFO] Received OPTIONS request to /api/activity
+[2026-06-16 15:51:13] [INFO] Received GET request to /api/dashboard
+[2026-06-16 15:51:13] [INFO] Dashboard data requested
+[2026-06-16 15:51:13] [INFO] Received GET request to /api/notifications
+[2026-06-16 15:51:13] [INFO] Received GET request to /api/activity
+[2026-06-16 15:51:13] [INFO] Received OPTIONS request to /api/dashboard
+[2026-06-16 15:51:13] [INFO] Received GET request to /api/dashboard
+[2026-06-16 15:51:13] [INFO] Dashboard data requested
+[2026-06-16 15:51:44] [INFO] Received OPTIONS request to /api/notifications
+[2026-06-16 15:51:44] [INFO] Received OPTIONS request to /api/activity
+[2026-06-16 15:51:44] [INFO] Received GET request to /api/notifications
+[2026-06-16 15:51:44] [INFO] Received GET request to /api/activity
+[2026-06-16 15:52:14] [INFO] Received OPTIONS request to /api/notifications
+[2026-06-16 15:52:14] [INFO] Received OPTIONS request to /api/activity
+[2026-06-16 15:52:14] [INFO] Received GET request to /api/notifications
+[2026-06-16 15:52:14] [INFO] Received GET request to /api/activity
+[2026-06-16 15:52:44] [INFO] Received OPTIONS request to /api/notifications
+[2026-06-16 15:52:44] [INFO] Received OPTIONS request to /api/activity
+[2026-06-16 15:52:44] [INFO] Received GET request to /api/notifications
+[2026-06-16 15:52:44] [INFO] Received GET request to /api/activity

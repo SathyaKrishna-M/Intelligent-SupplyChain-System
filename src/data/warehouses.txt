@@ -1,0 +1,4 @@
+W001,Central Hub,New York,10000
+W002,West Coast Facility,Los Angeles,8000
+W003,Midwest Depot,Chicago,6000
+W004,Southern Warehouse,Dallas,7500

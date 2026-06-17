@@ -1,0 +1,9 @@
+.git
+.gitignore
+frontend/
+data/
+reports/
+logs/
+bin/
+*.class
+*.md

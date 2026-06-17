@@ -1,0 +1,3 @@
+S001,TechNova Electronics,contact@technova.com,4.8
+S002,Global Logistics Corp,support@global.com,4.5
+S003,Apex Supply Co.,hello@apex.com,4.2

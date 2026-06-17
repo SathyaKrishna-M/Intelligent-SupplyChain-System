@@ -1,0 +1,3 @@
+N001,WARNING,Low Stock Alert,Product P005 running low in W004,2026-06-15T09:00:00Z,false,ALL
+N002,SUCCESS,Shipment Delivered,Shipment SH001 has been delivered.,2026-06-14T18:00:00Z,false,LOGISTICS_MANAGER
+N003,INFO,New Order Pending,Order O003 is awaiting approval.,2026-06-14T09:15:00Z,false,SUPPLIER

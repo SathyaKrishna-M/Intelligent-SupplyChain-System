@@ -1,0 +1,5 @@
+P001,Laptop Pro X,Electronics,150,800.0,1200.0,S001
+P002,Wireless Mouse,Electronics,500,15.0,35.0,S001
+P003,Ergonomic Chair,Furniture,200,80.0,200.0,S003
+P004,Mechanical Keyboard,Electronics,300,45.0,110.0,S001
+P005,Standing Desk,Furniture,80,150.0,350.0,S003

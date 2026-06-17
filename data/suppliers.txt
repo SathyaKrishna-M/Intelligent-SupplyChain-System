@@ -1,0 +1,3 @@
+S1,Techtronics Inc,contact@techtronics.com,4.5
+S2,Global Components,sales@globalcomp.com,4.0
+S3,FastShipping Logistics,info@fastshipping.com,4.8
