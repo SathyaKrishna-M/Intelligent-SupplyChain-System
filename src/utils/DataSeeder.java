@@ -21,17 +21,15 @@ import java.util.List;
 public class DataSeeder {
 
     public static void seedIfNeeded(FileManager fm, AuthenticationService authService, ProductService productService, WarehouseService warehouseService, SupplierService supplierService) {
-        boolean usersExist = new File("data/users.txt").exists();
-        boolean productsExist = new File("data/products.txt").exists();
+        boolean usersExist = !fm.loadUsers().isEmpty();
+        boolean productsExist = !fm.loadProducts().isEmpty();
 
         if (!usersExist) {
             Logger.info("Seeding initial users...");
-            List<User> users = fm.loadUsers();
-            users.add(new Admin("u1", "admin", "admin123"));
-            users.add(new WarehouseManager("u2", "manager", "manager123"));
-            users.add(new LogisticsManager("u3", "logistics", "log123"));
-            users.add(new SupplierUser("u4", "supplier", "sup123"));
-            fm.saveUsers(users);
+            authService.register("u1", "admin", "admin123", Role.ADMIN);
+            authService.register("u2", "manager", "manager123", Role.WAREHOUSE_MANAGER);
+            authService.register("u3", "logistics", "log123", Role.LOGISTICS_MANAGER);
+            authService.register("u4", "supplier", "sup123", Role.SUPPLIER);
         }
 
         if (!productsExist) {

@@ -20,7 +20,7 @@ const InventoryDistributionChart = ({ data, maxBlock }) => {
       </div>
       
       <div className="flex-1 min-h-0">
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" minHeight={300}>
           <BarChart data={data} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#334155" opacity={0.2} />
             <XAxis dataKey="warehouse" stroke="#64748b" fontSize={12} tickLine={false} axisLine={false} />
