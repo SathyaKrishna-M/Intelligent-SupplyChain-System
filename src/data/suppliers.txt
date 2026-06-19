@@ -1,5 +1,5 @@
-S001,TechNova Electronics,contact@technova.com,4.8
-S002,Global Logistics Corp,support@global.com,4.5
-S003,Apex Supply Co.,hello@apex.com,4.2
-TEST_S_1781811775891,QA Supplier,qa@test.com,4.5
-TEST_S_1781812334336,QA Supplier,qa@test.com,4.5
+SUP001,Global Vendor 1,+1-555-4819,4.3767356143197045
+SUP002,Global Vendor 2,+1-555-4302,4.123328930411223
+SUP003,Global Vendor 3,+1-555-0800,3.0134535996474767
+SUP004,Global Vendor 4,+1-555-5604,4.283988558870153
+SUP005,Global Vendor 5,+1-555-3335,4.891687761022985

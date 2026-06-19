@@ -32,42 +32,11 @@ public class DataSeeder {
             authService.register("u4", "supplier", "sup123", Role.SUPPLIER);
         }
 
-        // Check and seed missing files individually so tables are never empty
-        boolean warehousesExist = !fm.loadWarehouses().isEmpty();
-        boolean suppliersExist = !fm.loadSuppliers().isEmpty();
-        boolean ordersExist = !fm.loadOrders().isEmpty();
-        boolean shipmentsExist = !fm.loadShipments().isEmpty();
-        boolean salesExist = !fm.loadSalesRecords().isEmpty();
-
-        if (!productsExist) {
-            Logger.info("Seeding missing products...");
-            fm.saveProducts(DemoDataGenerator.generateProducts(10));
-        }
-        if (!warehousesExist) {
-            Logger.info("Seeding missing warehouses...");
-            fm.saveWarehouses(DemoDataGenerator.generateWarehouses(5));
-        }
-        if (!suppliersExist) {
-            Logger.info("Seeding missing suppliers...");
-            fm.saveSuppliers(DemoDataGenerator.generateSuppliers(5));
-        }
-        if (!ordersExist) {
-            Logger.info("Seeding missing orders...");
-            fm.saveOrders(DemoDataGenerator.generateOrders(15, fm.loadSuppliers(), fm.loadWarehouses()));
-        }
-        if (!shipmentsExist) {
-            Logger.info("Seeding missing shipments...");
-            fm.saveShipments(DemoDataGenerator.generateShipments(5, fm.loadOrders(), fm.loadWarehouses()));
-        }
-        if (!salesExist) {
-            Logger.info("Seeding missing sales...");
-            fm.saveSalesRecords(DemoDataGenerator.generateSalesRecords(10, fm.loadProducts()));
-        }
-
         // Self-healing: Check if routes are corrupted (referencing non-existent warehouses) due to the old bug
         List<models.Route> routes = fm.loadRoutes();
         List<Warehouse> whs = fm.loadWarehouses();
         boolean routesCorrupted = false;
+        
         for (models.Route r : routes) {
             boolean srcFound = false;
             boolean destFound = false;
@@ -81,9 +50,9 @@ public class DataSeeder {
             }
         }
         
-        if (routesCorrupted || routes.isEmpty()) {
-            Logger.info("Corrupted or empty routes detected. Self-healing network graph...");
-            fm.saveRoutes(DemoDataGenerator.generateRoutes(10, whs));
+        if (routesCorrupted) {
+            Logger.info("Corrupted routes detected. Wiping network graph so it can be built manually...");
+            fm.saveRoutes(new java.util.ArrayList<>());
         }
     }
 }

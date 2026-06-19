@@ -1,6 +1,0 @@
-N001,WARNING,Low Stock Alert,Product P005 running low in W004,2026-06-15T09:00:00Z,false,ALL
-N002,SUCCESS,Shipment Delivered,Shipment SH001 has been delivered.,2026-06-14T18:00:00Z,false,LOGISTICS_MANAGER
-N003,INFO,New Order Pending,Order O003 is awaiting approval.,2026-06-14T09:15:00Z,false,SUPPLIER
-abe5d88c-0da4-4fd9-835a-bef6f73c1d7d,INFO,Pending Order,New order ORD-AC055 is pending approval.,2026-06-19T00:16:23.2175228,false,SUPPLIER
-dd6a0a7e-8a50-45c5-9630-07a2fb7c81d9,INFO,Pending Order,New order ORD-BDB8D is pending approval.,2026-06-19T01:12:55.9074832,false,SUPPLIER
-11984881-2cf4-405d-89dc-9410b1bdc08d,INFO,Pending Order,New order ORD-66549 is pending approval.,2026-06-19T01:22:14.3513763,false,SUPPLIER

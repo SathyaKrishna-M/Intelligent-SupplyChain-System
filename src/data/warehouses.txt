@@ -1,5 +1,5 @@
-W001,Central Hub,New York,10000
-W002,West Coast Facility,Los Angeles,8000
-W003,Midwest Depot,Chicago,6000
-W004,Southern Warehouse,Dallas,7500
-W5,AlooHouse,India,1000
+WH01,Regional Hub 1,Tokyo,42312
+WH02,Regional Hub 2,Toronto,36301
+WH03,Regional Hub 3,Berlin,44453
+WH04,Regional Hub 4,Paris,36449
+WH05,Regional Hub 5,London,17412
