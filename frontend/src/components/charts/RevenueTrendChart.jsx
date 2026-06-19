@@ -4,6 +4,14 @@ import ChartSkeleton from './ChartSkeleton';
 
 const RevenueTrendChart = ({ data, title = "Revenue Analytics", subtitle = "Cumulative historical revenue calculated using Fenwick Trees" }) => {
   if (!data) return <ChartSkeleton />;
+  if (data.length === 0) {
+    return (
+      <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 h-96 flex flex-col justify-center items-center transition-all">
+        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100 mb-2">{title}</h3>
+        <p className="text-slate-400">No data available to visualize.</p>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 h-96 flex flex-col transition-all">
