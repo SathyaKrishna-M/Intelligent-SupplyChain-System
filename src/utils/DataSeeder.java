@@ -43,11 +43,11 @@ public class DataSeeder {
             
             if (!salesExist) {
                 Logger.info("Seeding missing sales data for charts...");
-                fm.saveSalesRecords(DemoDataGenerator.generateSalesRecords(200, fm.loadProducts()));
+                fm.saveSalesRecords(DemoDataGenerator.generateSalesRecords(10, fm.loadProducts()));
             }
             if (!shipmentsExist) {
                 Logger.info("Seeding missing shipments data for charts...");
-                fm.saveShipments(DemoDataGenerator.generateShipments(50, fm.loadOrders(), fm.loadWarehouses()));
+                fm.saveShipments(DemoDataGenerator.generateShipments(5, fm.loadOrders(), fm.loadWarehouses()));
             }
 
             // Self-healing: Check if routes are corrupted (referencing non-existent warehouses) due to the old bug
@@ -69,7 +69,7 @@ public class DataSeeder {
             
             if (routesCorrupted || routes.isEmpty()) {
                 Logger.info("Corrupted or empty routes detected. Self-healing network graph...");
-                fm.saveRoutes(DemoDataGenerator.generateRoutes(50, whs));
+                fm.saveRoutes(DemoDataGenerator.generateRoutes(10, whs));
             }
         }
     }

@@ -14,34 +14,34 @@ public class DemoDataGenerator {
         // Clear existing files (overwrite with empty lists/maps first? Or just rely on fileManager to overwrite)
         // For pure wipe, we just pass new lists.
         
-        List<Product> products = generateProducts(100);
+        List<Product> products = generateProducts(10);
         fileManager.saveProducts(products);
 
-        List<Warehouse> warehouses = generateWarehouses(20);
+        List<Warehouse> warehouses = generateWarehouses(5);
         fileManager.saveWarehouses(warehouses);
 
-        List<Supplier> suppliers = generateSuppliers(50);
+        List<Supplier> suppliers = generateSuppliers(5);
         fileManager.saveSuppliers(suppliers);
 
         List<User> users = generateUsers();
         fileManager.saveUsers(users);
 
-        List<Order> orders = generateOrders(500, suppliers, warehouses);
+        List<Order> orders = generateOrders(15, suppliers, warehouses);
         fileManager.saveOrders(orders);
 
-        List<Shipment> shipments = generateShipments(200, orders, warehouses);
+        List<Shipment> shipments = generateShipments(10, orders, warehouses);
         fileManager.saveShipments(shipments);
 
-        List<Driver> drivers = generateDrivers(30);
+        List<Driver> drivers = generateDrivers(5);
         fileManager.saveDrivers(drivers);
         
-        List<SalesRecord> sales = generateSalesRecords(1000, products);
+        List<SalesRecord> sales = generateSalesRecords(15, products);
         fileManager.saveSalesRecords(sales);
         
-        List<Route> routes = generateRoutes(50, warehouses);
+        List<Route> routes = generateRoutes(8, warehouses);
         fileManager.saveRoutes(routes);
 
-        Logger.audit("DemoDataGenerator", "Successfully generated demo data. (100 Prod, 20 WH, 50 Sup, 500 Ord, 200 Ship)");
+        Logger.audit("DemoDataGenerator", "Successfully generated demo data. (10 Prod, 5 WH, 5 Sup, 15 Ord, 10 Ship)");
     }
 
     public static List<Product> generateProducts(int count) {
