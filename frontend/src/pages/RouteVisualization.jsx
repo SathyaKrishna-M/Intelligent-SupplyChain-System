@@ -158,7 +158,9 @@ export default function RouteVisualization() {
         const newElements = [];
         
         // Nodes
+        const validWarehouseIds = new Set();
         wData.forEach(w => {
+          validWarehouseIds.add(w.warehouseId);
           let statusColor = '#10b981'; // Green Active
           let status = 'ACTIVE';
           if (w.capacity < 1000) { statusColor = '#ef4444'; status = 'CRITICAL'; }
@@ -179,6 +181,12 @@ export default function RouteVisualization() {
         
         // Edges
         rData.forEach(r => {
+          // Crash Protection: Ignore corrupted routes pointing to deleted or nonexistent warehouses
+          if (!validWarehouseIds.has(r.sourceWarehouseId) || !validWarehouseIds.has(r.destinationWarehouseId)) {
+            console.warn(`Skipping corrupted edge: ${r.sourceWarehouseId} -> ${r.destinationWarehouseId}`);
+            return;
+          }
+
           const distKm = r.distance >= 1000 ? `${(r.distance/1000).toFixed(2)}k km` : `${r.distance} km`;
           // Primary Edge
           newElements.push({
