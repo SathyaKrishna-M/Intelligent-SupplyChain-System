@@ -10,8 +10,11 @@ public class FileManager {
     private static final String REPORTS_DIR;
 
     static {
-        // Handle being run from either project root or inside src/
-        if (new java.io.File("src/data").exists()) {
+        String envStorage = System.getenv("STORAGE_PATH");
+        if (envStorage != null && !envStorage.trim().isEmpty()) {
+            DATA_DIR = envStorage + (envStorage.endsWith("/") ? "" : "/");
+            REPORTS_DIR = DATA_DIR + "../reports/";
+        } else if (new java.io.File("src/data").exists()) {
             DATA_DIR = "src/data/";
             REPORTS_DIR = "reports/";
         } else if (new java.io.File("data").exists()) {
