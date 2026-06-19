@@ -32,45 +32,58 @@ public class DataSeeder {
             authService.register("u4", "supplier", "sup123", Role.SUPPLIER);
         }
 
-        if (!productsExist) {
-            Logger.info("Seeding robust initial demo data...");
-            DemoDataGenerator.generateData(fm);
-            Logger.info("Massive demo dataset seeded successfully.");
-        } else {
-            // Check if specific files are missing (like sales or shipments) and seed them so charts load
-            boolean salesExist = !fm.loadSalesRecords().isEmpty();
-            boolean shipmentsExist = !fm.loadShipments().isEmpty();
-            
-            if (!salesExist) {
-                Logger.info("Seeding missing sales data for charts...");
-                fm.saveSalesRecords(DemoDataGenerator.generateSalesRecords(10, fm.loadProducts()));
-            }
-            if (!shipmentsExist) {
-                Logger.info("Seeding missing shipments data for charts...");
-                fm.saveShipments(DemoDataGenerator.generateShipments(5, fm.loadOrders(), fm.loadWarehouses()));
-            }
+        // Check and seed missing files individually so tables are never empty
+        boolean warehousesExist = !fm.loadWarehouses().isEmpty();
+        boolean suppliersExist = !fm.loadSuppliers().isEmpty();
+        boolean ordersExist = !fm.loadOrders().isEmpty();
+        boolean shipmentsExist = !fm.loadShipments().isEmpty();
+        boolean salesExist = !fm.loadSalesRecords().isEmpty();
 
-            // Self-healing: Check if routes are corrupted (referencing non-existent warehouses) due to the old bug
-            List<models.Route> routes = fm.loadRoutes();
-            List<Warehouse> whs = fm.loadWarehouses();
-            boolean routesCorrupted = false;
-            for (models.Route r : routes) {
-                boolean srcFound = false;
-                boolean destFound = false;
-                for (Warehouse w : whs) {
-                    if (w.getWarehouseId().equals(r.getSourceWarehouseId())) srcFound = true;
-                    if (w.getWarehouseId().equals(r.getDestinationWarehouseId())) destFound = true;
-                }
-                if (!srcFound || !destFound) {
-                    routesCorrupted = true;
-                    break;
-                }
+        if (!productsExist) {
+            Logger.info("Seeding missing products...");
+            fm.saveProducts(DemoDataGenerator.generateProducts(10));
+        }
+        if (!warehousesExist) {
+            Logger.info("Seeding missing warehouses...");
+            fm.saveWarehouses(DemoDataGenerator.generateWarehouses(5));
+        }
+        if (!suppliersExist) {
+            Logger.info("Seeding missing suppliers...");
+            fm.saveSuppliers(DemoDataGenerator.generateSuppliers(5));
+        }
+        if (!ordersExist) {
+            Logger.info("Seeding missing orders...");
+            fm.saveOrders(DemoDataGenerator.generateOrders(15, fm.loadSuppliers(), fm.loadWarehouses()));
+        }
+        if (!shipmentsExist) {
+            Logger.info("Seeding missing shipments...");
+            fm.saveShipments(DemoDataGenerator.generateShipments(5, fm.loadOrders(), fm.loadWarehouses()));
+        }
+        if (!salesExist) {
+            Logger.info("Seeding missing sales...");
+            fm.saveSalesRecords(DemoDataGenerator.generateSalesRecords(10, fm.loadProducts()));
+        }
+
+        // Self-healing: Check if routes are corrupted (referencing non-existent warehouses) due to the old bug
+        List<models.Route> routes = fm.loadRoutes();
+        List<Warehouse> whs = fm.loadWarehouses();
+        boolean routesCorrupted = false;
+        for (models.Route r : routes) {
+            boolean srcFound = false;
+            boolean destFound = false;
+            for (Warehouse w : whs) {
+                if (w.getWarehouseId().equals(r.getSourceWarehouseId())) srcFound = true;
+                if (w.getWarehouseId().equals(r.getDestinationWarehouseId())) destFound = true;
             }
-            
-            if (routesCorrupted || routes.isEmpty()) {
-                Logger.info("Corrupted or empty routes detected. Self-healing network graph...");
-                fm.saveRoutes(DemoDataGenerator.generateRoutes(10, whs));
+            if (!srcFound || !destFound) {
+                routesCorrupted = true;
+                break;
             }
+        }
+        
+        if (routesCorrupted || routes.isEmpty()) {
+            Logger.info("Corrupted or empty routes detected. Self-healing network graph...");
+            fm.saveRoutes(DemoDataGenerator.generateRoutes(10, whs));
         }
     }
 }
