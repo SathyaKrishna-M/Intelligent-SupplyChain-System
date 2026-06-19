@@ -11,22 +11,34 @@ const Inventory = () => {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const limit = 10;
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentProduct, setCurrentProduct] = useState({ productId: '', name: '', category: '', stockQuantity: 0, costPrice: 0, sellingPrice: 0, supplierId: '' });
   const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
-    fetchProducts();
-  }, []);
+    fetchProducts(currentPage);
+  }, [currentPage]);
 
-  const fetchProducts = async () => {
+  const fetchProducts = async (page = 1) => {
     try {
       setLoading(true);
-      const res = await api.get('/products');
+      const res = await api.get(`/products?page=${page}&limit=${limit}`);
       const d = res.data?.data || res.data;
       if (d && Array.isArray(d)) {
         setProducts(d);
         setLowStock(d.filter(p => p.stockQuantity <= 50));
+        
+        if (res.data?.meta) {
+          setTotalPages(res.data.meta.totalPages);
+          setTotalItems(res.data.meta.totalItems || 0);
+          setCurrentPage(res.data.meta.currentPage || 1);
+        }
       }
     } catch (error) {
       console.error("Failed to fetch products", error);
@@ -44,7 +56,7 @@ const Inventory = () => {
         await api.post('/products', currentProduct);
       }
       setIsModalOpen(false);
-      fetchProducts();
+      fetchProducts(currentPage);
     } catch (error) {
       console.error("Failed to save product", error);
       alert("Error saving product");
@@ -55,7 +67,7 @@ const Inventory = () => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
         await api.delete(`/products/${id}`);
-        fetchProducts();
+        fetchProducts(currentPage);
       } catch (error) {
         console.error("Failed to delete", error);
       }
@@ -156,7 +168,13 @@ const Inventory = () => {
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
       ) : (
-        <DataTable columns={columns} data={filteredProducts} keyField="productId" />
+        <DataTable 
+          columns={columns} 
+          data={filteredProducts} 
+          keyField="productId" 
+          pagination={{ currentPage, totalPages, totalItems, itemsPerPage: limit }}
+          onPageChange={(page) => setCurrentPage(page)}
+        />
       )}
 
       <Modal 

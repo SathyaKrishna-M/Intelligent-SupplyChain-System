@@ -100,7 +100,9 @@ public class ProductHandler implements HttpHandler {
                     Map<String, Object> req = JsonUtil.parseMap(body);
 
                     String newName = (String) req.get("name");
-                    double newPrice = req.get("price") != null ? ((Number) req.get("price")).doubleValue() : -1;
+                    double newPrice = -1;
+                    if (req.get("price") != null) newPrice = ((Number) req.get("price")).doubleValue();
+                    else if (req.get("sellingPrice") != null) newPrice = ((Number) req.get("sellingPrice")).doubleValue();
 
                     try {
                         productService.updateProduct(id, newName, newPrice);

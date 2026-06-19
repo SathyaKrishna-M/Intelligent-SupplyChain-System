@@ -2,15 +2,15 @@ import React from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import ChartSkeleton from './ChartSkeleton';
 
-const InventoryDistributionChart = ({ data, maxBlock }) => {
+const InventoryDistributionChart = ({ data, maxBlock, title = "Inventory Distribution", subtitle = "Stock levels queried rapidly via Segment Trees" }) => {
   if (!data) return <ChartSkeleton />;
 
   return (
     <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 h-96 flex flex-col transition-all">
       <div className="mb-4 flex justify-between items-start">
         <div>
-          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Inventory Distribution</h3>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Stock levels queried rapidly via Segment Trees</p>
+          <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">{title}</h3>
+          <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
         </div>
         {maxBlock !== undefined && (
           <div className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 px-3 py-1 rounded-full text-xs font-semibold">

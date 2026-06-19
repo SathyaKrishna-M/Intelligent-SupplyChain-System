@@ -5,7 +5,7 @@ import StatsGrid from '../../components/dashboard/StatsGrid';
 import KpiCard from '../../components/dashboard/KpiCard';
 import ActivityTimeline from '../../components/dashboard/ActivityTimeline';
 import NotificationPanel from '../../components/dashboard/NotificationPanel';
-import ChartCard from '../../components/dashboard/ChartCard';
+import RevenueTrendChart from '../../components/charts/RevenueTrendChart';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
 
@@ -17,14 +17,22 @@ const AdminDashboard = () => {
     totalOrders: 0,
     totalRevenue: 0,
   });
+  const [trendData, setTrendData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchDashboardStats = async () => {
       try {
-        const res = await api.get('/dashboard');
-        if (res.data) {
-          setStats(res.data.data || res.data);
+        const [dashRes, revRes] = await Promise.all([
+          api.get('/dashboard'),
+          api.get('/stats/revenue')
+        ]);
+        
+        if (dashRes.data) {
+          setStats(dashRes.data.data || dashRes.data);
+        }
+        if (revRes.data) {
+          setTrendData(revRes.data.data?.trend || []);
         }
       } catch (e) {
         console.error("Failed to fetch admin stats", e);
@@ -90,7 +98,11 @@ const AdminDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <ChartCard title="System Overview" subtitle="Revenue and Order trends over the last 30 days" />
+          <RevenueTrendChart 
+            data={trendData} 
+            title="System Overview" 
+            subtitle="Revenue and Order trends over the last 30 days" 
+          />
         </div>
         <div className="lg:col-span-1 flex flex-col gap-6">
           <NotificationPanel title="System Alerts" />

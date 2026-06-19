@@ -50,6 +50,29 @@ public class RouteHandler implements HttpHandler {
                     List<Route> routes = logisticsService.getGraph().getAllRoutes();
                     ApiServer.sendResponse(exchange, 200, JsonUtil.success("Routes retrieved", routes));
                 }
+            } else if ("POST".equalsIgnoreCase(method)) {
+                String body = ApiServer.readRequestBody(exchange);
+                Map<String, Object> req = JsonUtil.parseMap(body);
+
+                String routeId = (String) req.get("routeId");
+                String src = (String) req.get("sourceWarehouseId");
+                String dest = (String) req.get("destinationWarehouseId");
+                double distance = req.get("distance") != null ? ((Number) req.get("distance")).doubleValue() : 0.0;
+                double cost = req.get("transportCost") != null ? ((Number) req.get("transportCost")).doubleValue() : 0.0;
+
+                try {
+                    if (src == null || dest == null || src.trim().isEmpty() || dest.trim().isEmpty()) {
+                        throw new IllegalArgumentException("Source and Destination are required.");
+                    }
+                    if (routeId == null || routeId.trim().isEmpty()) {
+                        routeId = "RT-" + java.util.UUID.randomUUID().toString().substring(0, 5).toUpperCase();
+                    }
+                    Route r = new Route(routeId, src, dest, distance, cost);
+                    logisticsService.addRoute(r);
+                    ApiServer.sendResponse(exchange, 201, JsonUtil.success("Route Created", r));
+                } catch (IllegalArgumentException e) {
+                    ApiServer.sendResponse(exchange, 400, JsonUtil.error(e.getMessage()));
+                }
             } else {
                 ApiServer.sendResponse(exchange, 405, JsonUtil.error("Method Not Allowed"));
             }

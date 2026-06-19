@@ -71,7 +71,6 @@ public class ApiServer {
         server.createContext("/api/dashboard", corsWrapper(analyticsHandler));
         server.createContext("/api/stats", corsWrapper(analyticsHandler));
         server.createContext("/api/inventory", corsWrapper(analyticsHandler));
-        server.createContext("/api/forecast", corsWrapper(analyticsHandler));
         
         SystemHandler systemHandler = new SystemHandler(fileManager);
         server.createContext("/api/system/seed", corsWrapper(systemHandler));

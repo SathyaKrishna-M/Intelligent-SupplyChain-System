@@ -1,3 +1,4 @@
+import React, { Suspense, lazy } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from '../contexts/AuthContext';
 import ProtectedRoute from './ProtectedRoute';
@@ -12,18 +13,18 @@ import Suppliers from '../pages/Suppliers';
 import Orders from '../pages/Orders';
 import Shipments from '../pages/Shipments';
 import Logistics from '../pages/Logistics';
-import AnalyticsDashboard from '../pages/AnalyticsDashboard';
-import Forecasting from '../pages/Forecasting';
-import Reports from '../pages/Reports';
 import SystemHealth from '../pages/SystemHealth';
 import AboutSystem from '../pages/AboutSystem';
-import DsaStory from '../pages/DsaStory';
-import RouteVisualization from '../pages/RouteVisualization';
+import LoadingSpinner from '../components/common/LoadingSpinner';
+
+const AnalyticsDashboard = lazy(() => import('../pages/AnalyticsDashboard'));
+const RouteVisualization = lazy(() => import('../pages/RouteVisualization'));
 
 const AppRouter = () => {
   return (
     <AuthProvider>
       <Router>
+        <Suspense fallback={<LoadingSpinner message="Loading application module..." />}>
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
@@ -43,8 +44,6 @@ const AppRouter = () => {
               <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
                 <Route path="/warehouses" element={<Warehouses />} />
                 <Route path="/analytics" element={<AnalyticsDashboard />} />
-                <Route path="/forecasting" element={<Forecasting />} />
-                <Route path="/reports" element={<Reports />} />
                 <Route path="/system-health" element={<SystemHealth />} />
               </Route>
               
@@ -62,11 +61,11 @@ const AppRouter = () => {
                 <Route path="/route-visualization" element={<RouteVisualization />} />
               </Route>
               
-              <Route path="/dsa-story" element={<DsaStory />} />
               <Route path="/about" element={<AboutSystem />} />
             </Route>
           </Route>
         </Routes>
+        </Suspense>
       </Router>
     </AuthProvider>
   );

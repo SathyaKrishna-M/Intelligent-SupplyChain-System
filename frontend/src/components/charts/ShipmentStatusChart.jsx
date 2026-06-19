@@ -4,14 +4,14 @@ import ChartSkeleton from './ChartSkeleton';
 
 const COLORS = ['#10b981', '#f59e0b', '#64748b'];
 
-const ShipmentStatusChart = ({ data }) => {
+const ShipmentStatusChart = ({ data, title = "Shipment Status", subtitle = "Current live logistics breakdown" }) => {
   if (!data) return <ChartSkeleton />;
 
   return (
     <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 h-96 flex flex-col transition-all">
       <div className="mb-4">
-        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">Shipment Status</h3>
-        <p className="text-sm text-slate-500 dark:text-slate-400">Current live logistics breakdown</p>
+        <h3 className="text-lg font-bold text-slate-800 dark:text-slate-100">{title}</h3>
+        <p className="text-sm text-slate-500 dark:text-slate-400">{subtitle}</p>
       </div>
       
       <div className="flex-1 min-h-0">

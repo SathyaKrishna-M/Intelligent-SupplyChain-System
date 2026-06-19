@@ -5,7 +5,7 @@ import dagre from 'cytoscape-dagre';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Navigation, Box, Share2, Map, Zap, Database, RotateCcw, Play, 
-  MapPin, CheckCircle, AlertTriangle, Truck, Info, Settings, Compass, RefreshCw
+  MapPin, CheckCircle, AlertTriangle, Truck, Info, Settings, Compass, RefreshCw, Plus, X
 } from 'lucide-react';
 import api from '../services/api';
 
@@ -27,6 +27,11 @@ export default function RouteVisualization() {
   const [isCalculating, setIsCalculating] = useState(false);
   const [dijkstraResult, setDijkstraResult] = useState(null);
   
+  // Add Route Modal States
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [routeForm, setRouteForm] = useState({ src: '', dest: '', distance: 100, cost: 50 });
+  const [addError, setAddError] = useState('');
+  
   // Stats
   const stats = useMemo(() => {
     return {
@@ -45,8 +50,8 @@ export default function RouteVisualization() {
       style: {
         'label': 'data(label)',
         'shape': 'ellipse',
-        'width': 65,
-        'height': 65,
+        'width': 45,
+        'height': 45,
         'background-color': '#1e293b',
         'border-width': 4,
         'border-color': 'data(statusColor)',
@@ -72,8 +77,8 @@ export default function RouteVisualization() {
     {
       selector: 'node:selected',
       style: {
-        'width': 80,
-        'height': 80,
+        'width': 55,
+        'height': 55,
         'underlay-padding': 30,
         'underlay-opacity': 0.8,
         'border-color': '#38bdf8',
@@ -87,19 +92,18 @@ export default function RouteVisualization() {
         'underlay-color': '#10b981',
         'underlay-padding': 40,
         'underlay-opacity': 0.9,
-        'width': 75,
-        'height': 75
+        'width': 50,
+        'height': 50
       }
     },
     {
       selector: 'edge',
       style: {
-        'width': 3,
+        'width': 5,
         'line-color': '#334155',
         'curve-style': 'bezier',
         'control-point-step-size': 60,
-        'target-arrow-shape': 'triangle',
-        'target-arrow-color': '#334155',
+        'target-arrow-shape': 'none',
         'label': 'data(distanceLabel)',
         'font-size': 10,
         'font-weight': 'bold',
@@ -116,9 +120,8 @@ export default function RouteVisualization() {
     {
       selector: 'edge:selected',
       style: {
-        'width': 5,
+        'width': 8,
         'line-color': '#38bdf8',
-        'target-arrow-color': '#38bdf8',
         'color': '#38bdf8',
         'z-index': 10
       }
@@ -126,9 +129,8 @@ export default function RouteVisualization() {
     {
       selector: 'edge.path-edge',
       style: {
-        'width': 6,
+        'width': 9,
         'line-color': '#10b981',
-        'target-arrow-color': '#10b981',
         'color': '#10b981',
         'underlay-padding': 10,
         'underlay-color': '#10b981',
@@ -190,19 +192,6 @@ export default function RouteVisualization() {
               cost: r.transportCost
             }
           });
-          
-          // Visualization-only Reverse Edge
-          newElements.push({
-            group: 'edges',
-            data: {
-              id: (r.routeId || `${r.sourceWarehouseId}-${r.destinationWarehouseId}`) + '_REV',
-              source: r.destinationWarehouseId,
-              target: r.sourceWarehouseId,
-              distance: r.distance,
-              distanceLabel: distKm,
-              cost: r.transportCost
-            }
-          });
         });
         
         setElements(newElements);
@@ -212,6 +201,30 @@ export default function RouteVisualization() {
     };
     loadGraph();
   }, []);
+
+  const handleAddRoute = async (e) => {
+    e.preventDefault();
+    setAddError('');
+    if (routeForm.src === routeForm.dest) {
+      setAddError("Source and Destination cannot be the same.");
+      return;
+    }
+    try {
+      const payload = {
+        sourceWarehouseId: routeForm.src,
+        destinationWarehouseId: routeForm.dest,
+        distance: Number(routeForm.distance),
+        transportCost: Number(routeForm.cost)
+      };
+      await api.post('/routes', payload);
+      setIsAddModalOpen(false);
+      setRouteForm({ src: '', dest: '', distance: 100, cost: 50 });
+      // Full refresh to rebuild graph
+      window.location.reload(); 
+    } catch (err) {
+      setAddError(err.response?.data?.message || "Failed to add route");
+    }
+  };
 
   // Cytoscape Event Binding
   const handleCy = (cy) => {
@@ -282,8 +295,8 @@ export default function RouteVisualization() {
         for (let i=0; i<data.path.length-1; i++) {
           const s = data.path[i];
           const t = data.path[i+1];
-          // Find edge matching this directed pair
-          const edge = cy.edges(`[source="${s}"][target="${t}"]`);
+          // Find edge matching this undirected pair
+          const edge = cy.edges(`[source="${s}"][target="${t}"], [source="${t}"][target="${s}"]`);
           if (edge.length > 0) {
             edge.addClass('path-edge');
             pathEdges.push(edge);
@@ -325,6 +338,13 @@ export default function RouteVisualization() {
           <div className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 mr-2 shadow-[0_0_8px_#10b981]"></span> ACTIVE</div>
           <div className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 mr-2 shadow-[0_0_8px_#f59e0b]"></span> LOW STOCK</div>
           <div className="flex items-center"><span className="w-2.5 h-2.5 rounded-full bg-rose-500 mr-2 shadow-[0_0_8px_#e11d48]"></span> CRITICAL</div>
+          
+          <button 
+            onClick={() => setIsAddModalOpen(true)}
+            className="flex items-center px-3 py-1.5 bg-blue-600/20 text-blue-400 border border-blue-500/30 rounded hover:bg-blue-600/30 transition-colors"
+          >
+            <Plus size={14} className="mr-1" /> Add Route
+          </button>
         </div>
       </div>
 
@@ -438,9 +458,9 @@ export default function RouteVisualization() {
                 name: 'concentric', 
                 fit: true, 
                 padding: 100,
-                spacingFactor: 2.5,
+                spacingFactor: 1.5,
                 nodeDimensionsIncludeLabels: true,
-                minNodeSpacing: 80
+                minNodeSpacing: 40
               }}
               cy={(cy) => handleCy(cy)}
               minZoom={0.3}
@@ -568,6 +588,76 @@ export default function RouteVisualization() {
         </AnimatePresence>
 
       </div>
+
+      {/* Add Route Modal */}
+      {isAddModalOpen && (
+        <div className="fixed inset-0 bg-[#020617]/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 font-sans">
+          <div className="bg-[#0f172a] rounded-xl shadow-2xl max-w-md w-full border border-slate-700 overflow-hidden">
+            <div className="px-6 py-4 border-b border-slate-800 flex justify-between items-center bg-[#0b1120]">
+              <h2 className="font-bold text-lg text-white flex items-center">
+                <Share2 size={18} className="mr-2 text-indigo-400" /> Create Network Link
+              </h2>
+              <button onClick={() => setIsAddModalOpen(false)} className="text-slate-400 hover:text-white transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+            
+            <form onSubmit={handleAddRoute} className="p-6 space-y-4 text-slate-200">
+              {addError && (
+                <div className="p-3 bg-red-500/10 text-red-400 text-sm rounded-lg border border-red-500/20">
+                  {addError}
+                </div>
+              )}
+              
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Source Hub</label>
+                  <select 
+                    required value={routeForm.src} onChange={e => setRouteForm({...routeForm, src: e.target.value})}
+                    className="w-full bg-[#1e293b] text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value="">Select...</option>
+                    {warehouses.map(w => <option key={w.warehouseId} value={w.warehouseId}>{w.warehouseName} ({w.warehouseId})</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Dest Hub</label>
+                  <select 
+                    required value={routeForm.dest} onChange={e => setRouteForm({...routeForm, dest: e.target.value})}
+                    className="w-full bg-[#1e293b] text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-indigo-500"
+                  >
+                    <option value="">Select...</option>
+                    {warehouses.map(w => <option key={w.warehouseId} value={w.warehouseId}>{w.warehouseName} ({w.warehouseId})</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Distance (km)</label>
+                  <input 
+                    type="number" required min="1" value={routeForm.distance} onChange={e => setRouteForm({...routeForm, distance: e.target.value})}
+                    className="w-full bg-[#1e293b] text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">Est. Cost ($)</label>
+                  <input 
+                    type="number" required min="1" value={routeForm.cost} onChange={e => setRouteForm({...routeForm, cost: e.target.value})}
+                    className="w-full bg-[#1e293b] text-sm text-slate-200 border border-slate-700 rounded-lg px-3 py-2 outline-none focus:ring-1 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+
+              <div className="flex gap-3 pt-4 border-t border-slate-800">
+                <button type="button" onClick={() => setIsAddModalOpen(false)} className="flex-1 px-4 py-2 border border-slate-700 text-slate-300 font-bold rounded-lg hover:bg-slate-800 transition-colors">Cancel</button>
+                <button type="submit" className="flex-1 px-4 py-2 bg-indigo-600 text-white font-bold rounded-lg hover:bg-indigo-700 shadow-[0_0_15px_rgba(79,70,229,0.3)] transition-all">Link Hubs</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

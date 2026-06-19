@@ -5,7 +5,7 @@ import StatsGrid from '../../components/dashboard/StatsGrid';
 import KpiCard from '../../components/dashboard/KpiCard';
 import ActivityTimeline from '../../components/dashboard/ActivityTimeline';
 import NotificationPanel from '../../components/dashboard/NotificationPanel';
-import ChartCard from '../../components/dashboard/ChartCard';
+import InventoryDistributionChart from '../../components/charts/InventoryDistributionChart';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
 
@@ -16,6 +16,8 @@ const WarehouseDashboard = () => {
     lowStock: 0,
     incomingOrders: 0,
     capacity: 0,
+    inventoryData: null,
+    maxBlock: undefined,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -32,6 +34,8 @@ const WarehouseDashboard = () => {
           lowStock: dashRes.data?.data?.lowStock || 0,
           incomingOrders: dashRes.data?.data?.pendingOrders || 0,
           capacity: 85, // Mock capacity
+          inventoryData: invRes.data?.data?.distribution || [],
+          maxBlock: invRes.data?.data?.maxBlock,
         });
       } catch (e) {
         console.error("Failed to fetch warehouse stats", e);
@@ -64,6 +68,8 @@ const WarehouseDashboard = () => {
         lowStock: dashRes.data?.data?.lowStock || 0,
         incomingOrders: dashRes.data?.data?.pendingOrders || 0,
         capacity: 85,
+        inventoryData: invRes.data?.data?.distribution || [],
+        maxBlock: invRes.data?.data?.maxBlock,
       });
     } catch (e) {
       console.error("Failed to receive shipment", e);
@@ -119,7 +125,12 @@ const WarehouseDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <ChartCard title="Inventory Summary" subtitle="Stock levels by category" height="h-96" />
+          <InventoryDistributionChart 
+            data={stats.inventoryData} 
+            maxBlock={stats.maxBlock} 
+            title="Inventory Summary" 
+            subtitle="Stock levels by category" 
+          />
         </div>
         <div className="lg:col-span-1 flex flex-col gap-6">
           <NotificationPanel title="Low Stock Alerts" />

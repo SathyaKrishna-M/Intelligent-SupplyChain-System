@@ -69,26 +69,20 @@ public class AnalyticsHandler implements HttpHandler {
                     Logger.info("Dashboard data requested");
                     
                 } else if (path.equals("/api/stats/revenue") || path.equals("/api/analytics/revenue")) {
-                    double revenue = orderService.getAllOrders().stream()
-                        .filter(o -> o.getStatus() == OrderStatus.DELIVERED)
-                        .mapToDouble(Order::getTotalCost)
-                        .sum();
-                    
-                    // Generate Time-Series Data for Chart using SalesRecords
                     List<models.SalesRecord> sales = execDashboard.getSalesRecords();
-                    Map<String, Double> dailyRev = new java.util.TreeMap<>();
-                    for (models.SalesRecord s : sales) {
-                        dailyRev.put(s.getDate(), dailyRev.getOrDefault(s.getDate(), 0.0) + s.getRevenue());
-                    }
+                    int lastIdx = Math.max(0, sales.size() - 1);
+                    double revenue = sales.isEmpty() ? 0 : execDashboard.getCumulativeRevenue(lastIdx); // Fenwick Tree!
                     
                     List<Map<String, Object>> trendData = new java.util.ArrayList<>();
-                    double cumulative = 0;
-                    for (Map.Entry<String, Double> entry : dailyRev.entrySet()) {
-                        cumulative += entry.getValue();
+                    
+                    // Use FenwickTree for O(log N) cumulative sum instead of manual accumulator
+                    for (int i = 0; i < sales.size(); i++) {
+                        models.SalesRecord s = sales.get(i);
                         Map<String, Object> point = new HashMap<>();
-                        point.put("date", entry.getKey());
-                        point.put("daily", entry.getValue());
-                        point.put("cumulative", cumulative);
+                        point.put("date", s.getDate());
+                        point.put("daily", s.getRevenue());
+                        point.put("cumulative", execDashboard.getCumulativeRevenue(i)); // Fenwick Query
+                        point.put("rangeSumExample", execDashboard.getRevenueRangeSum(Math.max(0, i-5), i)); // Segment Query
                         trendData.add(point);
                     }
 
@@ -99,10 +93,12 @@ public class AnalyticsHandler implements HttpHandler {
                     
                 } else if (path.equals("/api/stats/inventory") || path.equals("/api/analytics/inventory")) {
                     List<Product> products = productService.listAllProducts();
-                    int totalStock = products.stream().mapToInt(Product::getStockQuantity).sum();
                     double totalValue = products.stream().mapToDouble(p -> p.getStockQuantity() * p.getCostPrice()).sum();
                     
                     List<models.WarehouseInventory> inv = execDashboard.getWarehouseInventory();
+                    int lastIdx = Math.max(0, inv.size() - 1);
+                    int totalStock = inv.isEmpty() ? 0 : execDashboard.getInventorySum(0, lastIdx); // Segment Tree Query!
+                    
                     Map<String, Integer> whStock = new HashMap<>();
                     for (models.WarehouseInventory wi : inv) {
                         whStock.put(wi.getWarehouseId(), whStock.getOrDefault(wi.getWarehouseId(), 0) + wi.getQuantity());
@@ -122,17 +118,19 @@ public class AnalyticsHandler implements HttpHandler {
                     res.put("totalValue", totalValue);
                     res.put("distribution", distribution);
                     
-                    if (execDashboard.getInventoryTree() != null && !inv.isEmpty()) {
-                        res.put("maxBlock", execDashboard.getInventoryTree().rangeMax(0, inv.size()-1));
-                        res.put("minBlock", execDashboard.getInventoryTree().rangeMin(0, inv.size()-1));
+                    if (!inv.isEmpty()) {
+                        res.put("maxBlock", execDashboard.getInventoryMax(0, lastIdx)); // Segment Tree Query!
+                        res.put("minBlock", execDashboard.getInventoryMin(0, lastIdx)); // Segment Tree Query!
                     }
                     
                     ApiServer.sendResponse(exchange, 200, JsonUtil.success("Inventory stats", res));
                     
                 } else if (path.equals("/api/stats/logistics")) {
                     List<Shipment> shipments = logisticsService.getAllShipments();
+                    int totalShipments = shipments.isEmpty() ? 0 : execDashboard.getRunningShipments(shipments.size() - 1); // Fenwick Tree Query!
+                    
                     Map<String, Object> res = new HashMap<>();
-                    res.put("totalShipments", shipments.size());
+                    res.put("totalShipments", totalShipments);
                     long inTransit = shipments.stream().filter(s -> s.getStatus() == ShipmentStatus.IN_TRANSIT).count();
                     long delivered = shipments.stream().filter(s -> s.getStatus() == ShipmentStatus.DELIVERED).count();
                     long pending = shipments.stream().filter(s -> s.getStatus() == ShipmentStatus.CREATED || s.getStatus() == ShipmentStatus.ASSIGNED).count();
@@ -172,41 +170,6 @@ public class AnalyticsHandler implements HttpHandler {
                 } else if (path.equals("/api/inventory/low-stock")) {
                     List<Product> lowStock = productService.getLowStockProducts();
                     ApiServer.sendResponse(exchange, 200, JsonUtil.success("Low stock products", lowStock));
-                    
-                } else if (path.equals("/api/forecast") || path.equals("/api/analytics/forecast")) {
-                    List<Product> lowStock = productService.getLowStockProducts();
-                    
-                    // Generate historical timeline data for AreaChart
-                    List<Map<String, Object>> timeline = new java.util.ArrayList<>();
-                    String[] months = {"Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"};
-                    int base = 500;
-                    for (int i=0; i<12; i++) {
-                        Map<String, Object> pt = new HashMap<>();
-                        pt.put("month", months[i]);
-                        pt.put("historical", base + (Math.random() * 200 - 100));
-                        if (i >= 9) { // Last 3 months include prediction
-                            pt.put("predicted", pt.get("historical"));
-                        } else if (i == 8) {
-                            pt.put("predicted", pt.get("historical")); // Connection point
-                        }
-                        timeline.add(pt);
-                    }
-                    
-                    List<Map<String, Object>> forecastList = lowStock.stream().map(p -> {
-                        Map<String, Object> f = new HashMap<>();
-                        f.put("product", p);
-                        f.put("currentStock", p.getStockQuantity());
-                        f.put("predictedDemand", 100); 
-                        f.put("recommendedReorder", 100 - p.getStockQuantity() + 20); 
-                        return f;
-                    }).collect(Collectors.toList());
-                    
-                    Map<String, Object> res = new HashMap<>();
-                    res.put("items", forecastList);
-                    res.put("timeline", timeline);
-                    
-                    ApiServer.sendResponse(exchange, 200, JsonUtil.success("Forecast data", res));
-                    
                 } else {
                     ApiServer.sendResponse(exchange, 404, JsonUtil.error("Not Found"));
                 }

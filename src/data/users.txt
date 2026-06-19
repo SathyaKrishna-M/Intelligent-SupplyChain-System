@@ -1,3 +1,4 @@
 U1,admin,admin,ADMIN
 A1,AlooMan,AlooMan,LOGISTICS_MANAGER
 A2,AlooSup,AlooSup,SUPPLIER
+W1,Ware,Ware,WAREHOUSE_MANAGER

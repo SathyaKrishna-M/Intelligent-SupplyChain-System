@@ -18,9 +18,6 @@ const Sidebar = () => {
     { name: 'Shipments', icon: <Truck size={20} />, path: '/shipments', roles: ['ADMIN', 'LOGISTICS_MANAGER'] },
     { name: 'Logistics Network', icon: <Map size={20} />, path: '/logistics', roles: ['ADMIN', 'LOGISTICS_MANAGER'] },
     { name: 'Analytics', icon: <BarChart3 size={20} />, path: '/analytics', roles: ['ADMIN'] },
-    { name: 'Forecasting', icon: <TrendingUp size={20} />, path: '/forecasting', roles: ['ADMIN'] },
-    { name: 'DSA Visualization', icon: <Share2 size={20} />, path: '/dsa-story', roles: ['ADMIN', 'WAREHOUSE_MANAGER', 'LOGISTICS_MANAGER', 'SUPPLIER'] },
-    { name: 'Reports', icon: <FileText size={20} />, path: '/reports', roles: ['ADMIN'] },
     { name: 'System Health', icon: <Activity size={20} />, path: '/system-health', roles: ['ADMIN'] },
     { name: 'About System', icon: <Info size={20} />, path: '/about', roles: ['ADMIN', 'WAREHOUSE_MANAGER', 'LOGISTICS_MANAGER', 'SUPPLIER'] },
   ];

@@ -19,6 +19,7 @@ public class FenwickTree {
 
     public double prefixSum(int i) {
         i++;
+        if (i > n) i = n; // Safe bounds mapping for dynamic runtime data
         double sum = 0;
         while (i > 0) {
             sum += tree[i];

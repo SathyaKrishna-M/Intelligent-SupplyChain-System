@@ -2,7 +2,16 @@ import React from 'react';
 import { ChevronLeft, ChevronRight, Inbox } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const DataTable = ({ columns, data, keyField = 'id', onRowClick, emptyMessage = "No data available" }) => {
+const DataTable = ({ 
+  columns, 
+  data, 
+  keyField = 'id', 
+  onRowClick, 
+  emptyMessage = "No data available",
+  actions = [], // Array of { label, icon, onClick, colorClass }
+  pagination = null, // { currentPage, totalPages, totalItems, itemsPerPage }
+  onPageChange = null
+}) => {
   return (
     <div className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-xl rounded-2xl shadow-sm border border-slate-100 dark:border-slate-700/50 overflow-hidden flex flex-col transition-colors duration-300 max-h-[600px]">
       <div className="overflow-x-auto overflow-y-auto custom-scrollbar flex-1">
@@ -14,6 +23,9 @@ const DataTable = ({ columns, data, keyField = 'id', onRowClick, emptyMessage = 
                   {col.header}
                 </th>
               ))}
+              {actions && actions.length > 0 && (
+                <th className="px-6 py-4 whitespace-nowrap text-right">Actions</th>
+              )}
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-700/50">
@@ -47,6 +59,25 @@ const DataTable = ({ columns, data, keyField = 'id', onRowClick, emptyMessage = 
                         {col.cell ? col.cell(row) : row[col.accessor]}
                       </td>
                     ))}
+                    {actions && actions.length > 0 && (
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex justify-end space-x-2">
+                          {actions.map((action, actIdx) => (
+                            <button
+                              key={actIdx}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                action.onClick(row);
+                              }}
+                              className={`p-1.5 rounded-lg border border-transparent hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors ${action.colorClass || 'text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200'}`}
+                              title={action.label}
+                            >
+                              {action.icon}
+                            </button>
+                          ))}
+                        </div>
+                      </td>
+                    )}
                   </motion.tr>
                 ))
               )}
@@ -55,16 +86,32 @@ const DataTable = ({ columns, data, keyField = 'id', onRowClick, emptyMessage = 
         </table>
       </div>
       
-      {/* Simple Pagination Placeholder */}
+      {/* Pagination */}
       <div className="flex items-center justify-between px-6 py-4 border-t border-slate-100 dark:border-slate-700/50 bg-slate-50/50 dark:bg-slate-900/50">
         <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-          Showing <span className="text-slate-700 dark:text-slate-200">1</span> to <span className="text-slate-700 dark:text-slate-200">{data.length}</span> of <span className="text-slate-700 dark:text-slate-200">{data.length}</span> entries
+          {pagination ? (
+            <>
+              Showing <span className="text-slate-700 dark:text-slate-200">{(pagination.currentPage - 1) * pagination.itemsPerPage + 1}</span> to <span className="text-slate-700 dark:text-slate-200">{Math.min(pagination.currentPage * pagination.itemsPerPage, pagination.totalItems)}</span> of <span className="text-slate-700 dark:text-slate-200">{pagination.totalItems}</span> entries
+            </>
+          ) : (
+            <>
+              Showing <span className="text-slate-700 dark:text-slate-200">{data.length ? 1 : 0}</span> to <span className="text-slate-700 dark:text-slate-200">{data.length}</span> of <span className="text-slate-700 dark:text-slate-200">{data.length}</span> entries
+            </>
+          )}
         </span>
         <div className="flex space-x-2">
-          <button className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent hover:border-slate-300 dark:hover:border-slate-600 disabled:opacity-50 transition-all">
+          <button 
+            disabled={!pagination || pagination.currentPage <= 1}
+            onClick={() => onPageChange && onPageChange(pagination.currentPage - 1)}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent hover:border-slate-300 dark:hover:border-slate-600 disabled:opacity-50 transition-all"
+          >
             <ChevronLeft size={16} />
           </button>
-          <button className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent hover:border-slate-300 dark:hover:border-slate-600 disabled:opacity-50 transition-all">
+          <button 
+            disabled={!pagination || pagination.currentPage >= pagination.totalPages}
+            onClick={() => onPageChange && onPageChange(pagination.currentPage + 1)}
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-transparent hover:border-slate-300 dark:hover:border-slate-600 disabled:opacity-50 transition-all"
+          >
             <ChevronRight size={16} />
           </button>
         </div>

@@ -4,7 +4,7 @@ import DashboardHeader from '../../components/dashboard/DashboardHeader';
 import StatsGrid from '../../components/dashboard/StatsGrid';
 import KpiCard from '../../components/dashboard/KpiCard';
 import ActivityTimeline from '../../components/dashboard/ActivityTimeline';
-import ChartCard from '../../components/dashboard/ChartCard';
+import ShipmentStatusChart from '../../components/charts/ShipmentStatusChart';
 import { useAuth } from '../../hooks/useAuth';
 import api from '../../services/api';
 
@@ -15,6 +15,7 @@ const LogisticsDashboard = () => {
     driversAvailable: 0,
     avgDeliveryTime: 0,
     completedDeliveries: 0,
+    shipmentStatus: null,
   });
   const [isLoading, setIsLoading] = useState(true);
 
@@ -31,6 +32,7 @@ const LogisticsDashboard = () => {
           driversAvailable: 12, // Mock data
           avgDeliveryTime: 4.5, // Mock data in hours
           completedDeliveries: logRes.data?.data?.delivered || 0,
+          shipmentStatus: logRes.data?.data?.statusBreakdown || [],
         });
       } catch (e) {
         console.error("Failed to fetch logistics stats", e);
@@ -62,6 +64,7 @@ const LogisticsDashboard = () => {
         driversAvailable: 12,
         avgDeliveryTime: 4.5,
         completedDeliveries: logRes.data?.data?.delivered || 0,
+        shipmentStatus: logRes.data?.data?.statusBreakdown || [],
       });
     } catch (e) {
       console.error("Failed to dispatch driver", e);
@@ -117,7 +120,11 @@ const LogisticsDashboard = () => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
-          <ChartCard title="Shipment Overview" subtitle="Delivery volumes across the network map" height="h-96" />
+          <ShipmentStatusChart 
+            data={stats.shipmentStatus} 
+            title="Shipment Overview" 
+            subtitle="Delivery volumes across the network map" 
+          />
         </div>
         <div className="lg:col-span-1">
           <ActivityTimeline title="Recent Deliveries & Dispatches" />

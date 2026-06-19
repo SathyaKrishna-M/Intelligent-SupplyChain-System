@@ -7,7 +7,6 @@ import InventoryDistributionChart from '../components/charts/InventoryDistributi
 import SupplierPerformanceChart from '../components/charts/SupplierPerformanceChart';
 import WarehousePerformanceChart from '../components/charts/WarehousePerformanceChart';
 import ShipmentStatusChart from '../components/charts/ShipmentStatusChart';
-import DemandForecastChart from '../components/charts/DemandForecastChart';
 import { Database } from 'lucide-react';
 
 const AnalyticsDashboard = () => {
@@ -15,7 +14,6 @@ const AnalyticsDashboard = () => {
   const [inventoryData, setInventoryData] = useState(null);
   const [supplierData, setSupplierData] = useState(null);
   const [logisticsData, setLogisticsData] = useState(null);
-  const [forecastData, setForecastData] = useState(null);
   const [warehouseData, setWarehouseData] = useState(null);
 
   useEffect(() => {
@@ -24,19 +22,17 @@ const AnalyticsDashboard = () => {
 
   const fetchData = async () => {
     try {
-      const [revRes, invRes, supRes, logRes, foreRes] = await Promise.all([
+      const [revRes, invRes, supRes, logRes] = await Promise.all([
         api.get('/stats/revenue'),
         api.get('/stats/inventory'),
         api.get('/stats/suppliers'),
-        api.get('/stats/logistics'),
-        api.get('/forecast')
+        api.get('/stats/logistics')
       ]);
 
       setRevenueData(revRes.data.data);
       setInventoryData(invRes.data.data);
       setSupplierData(supRes.data.data);
       setLogisticsData(logRes.data.data);
-      setForecastData(foreRes.data.data);
 
       // Map metrics for Warehouse Performance
       setWarehouseData([
@@ -73,38 +69,43 @@ const AnalyticsDashboard = () => {
         <WarehousePerformanceChart data={warehouseData} />
         <SupplierPerformanceChart data={supplierData?.ranking} />
         <ShipmentStatusChart data={logisticsData?.statusBreakdown} />
-        <DemandForecastChart data={forecastData?.timeline} />
       </div>
 
       <div className="bg-gradient-to-r from-slate-900 to-slate-800 p-6 rounded-xl shadow-lg mt-8 text-white">
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-3 mb-6">
           <Database className="w-6 h-6 text-blue-400" />
-          <h2 className="text-lg font-bold">Algorithms Powering This Dashboard</h2>
+          <h2 className="text-xl font-bold">Algorithms Powering This Dashboard</h2>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 text-sm">
-          <div className="bg-white/10 p-3 rounded-lg border border-white/5">
-            <div className="text-blue-300 font-medium mb-1">Revenue Analytics</div>
-            <div className="text-slate-300 text-xs flex items-center gap-1">→ Fenwick Tree</div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-white/10 p-5 rounded-lg border border-white/10">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-blue-300 font-bold text-lg">Fenwick Tree (Binary Indexed Tree)</h3>
+              <span className="bg-blue-900/50 text-blue-200 text-xs px-2 py-1 rounded">O(log N)</span>
+            </div>
+            <p className="text-slate-300 text-sm mb-4">
+              Dynamically tracks cumulative sums across arrays by storing partial sums in a tree structure. It powers the <strong>Revenue Trend Chart</strong> and <strong>Logistics Shipment Totals</strong>.
+            </p>
+            <div className="bg-slate-900/50 p-3 rounded font-mono text-xs text-blue-200 border border-slate-700">
+              <span className="text-slate-400">// Live Runtime Calculation:</span><br/>
+              revenueFenwick.prefixSum(todayIndex); <br/>
+              <span className="text-emerald-400">→ Result: ${revenueData?.totalRevenue?.toLocaleString()}</span>
+            </div>
           </div>
-          <div className="bg-white/10 p-3 rounded-lg border border-white/5">
-            <div className="text-emerald-300 font-medium mb-1">Inventory Analytics</div>
-            <div className="text-slate-300 text-xs flex items-center gap-1">→ Segment Tree</div>
-          </div>
-          <div className="bg-white/10 p-3 rounded-lg border border-white/5">
-            <div className="text-amber-300 font-medium mb-1">Forecasting</div>
-            <div className="text-slate-300 text-xs flex items-center gap-1">→ Moving Average</div>
-          </div>
-          <div className="bg-white/10 p-3 rounded-lg border border-white/5">
-            <div className="text-purple-300 font-medium mb-1">Route Optimization</div>
-            <div className="text-slate-300 text-xs flex items-center gap-1">→ Dijkstra</div>
-          </div>
-          <div className="bg-white/10 p-3 rounded-lg border border-white/5">
-            <div className="text-rose-300 font-medium mb-1">Product Search</div>
-            <div className="text-slate-300 text-xs flex items-center gap-1">→ AVL Tree</div>
-          </div>
-          <div className="bg-white/10 p-3 rounded-lg border border-white/5">
-            <div className="text-cyan-300 font-medium mb-1">Order Indexing</div>
-            <div className="text-slate-300 text-xs flex items-center gap-1">→ B-Tree</div>
+
+          <div className="bg-white/10 p-5 rounded-lg border border-white/10">
+            <div className="flex justify-between items-center mb-3">
+              <h3 className="text-emerald-300 font-bold text-lg">Segment Tree</h3>
+              <span className="bg-emerald-900/50 text-emerald-200 text-xs px-2 py-1 rounded">O(log N)</span>
+            </div>
+            <p className="text-slate-300 text-sm mb-4">
+              Answers complex range queries (Min, Max, Sum) over array intervals. It powers the <strong>Inventory Distribution Analytics</strong> and historical bounds queries.
+            </p>
+            <div className="bg-slate-900/50 p-3 rounded font-mono text-xs text-emerald-200 border border-slate-700">
+              <span className="text-slate-400">// Live Runtime Calculation:</span><br/>
+              inventorySegment.rangeMax(0, numWarehouses - 1); <br/>
+              <span className="text-emerald-400">→ Result: {inventoryData?.maxBlock?.toLocaleString()} units max single block</span>
+            </div>
           </div>
         </div>
       </div>
