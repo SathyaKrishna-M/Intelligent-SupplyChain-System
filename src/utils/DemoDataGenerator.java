@@ -44,7 +44,7 @@ public class DemoDataGenerator {
         Logger.audit("DemoDataGenerator", "Successfully generated demo data. (100 Prod, 20 WH, 50 Sup, 500 Ord, 200 Ship)");
     }
 
-    private static List<Product> generateProducts(int count) {
+    public static List<Product> generateProducts(int count) {
         List<Product> list = new ArrayList<>();
         String[] categories = {"Electronics", "Apparel", "Home & Garden", "Automotive", "Industrial", "Medical"};
         for (int i = 1; i <= count; i++) {
@@ -57,7 +57,7 @@ public class DemoDataGenerator {
         return list;
     }
 
-    private static List<Warehouse> generateWarehouses(int count) {
+    public static List<Warehouse> generateWarehouses(int count) {
         List<Warehouse> list = new ArrayList<>();
         String[] cities = {"New York", "London", "Tokyo", "Berlin", "Sydney", "Mumbai", "Toronto", "Dubai", "Singapore", "Paris"};
         for (int i = 1; i <= count; i++) {
@@ -67,7 +67,7 @@ public class DemoDataGenerator {
         return list;
     }
 
-    private static List<Supplier> generateSuppliers(int count) {
+    public static List<Supplier> generateSuppliers(int count) {
         List<Supplier> list = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             Supplier s = new Supplier("SUP" + String.format("%03d", i), "Global Vendor " + i, "+1-555-" + String.format("%04d", rand.nextInt(10000)), 3.0 + (2.0 * rand.nextDouble()));
@@ -76,7 +76,7 @@ public class DemoDataGenerator {
         return list;
     }
 
-    private static List<User> generateUsers() {
+    public static List<User> generateUsers() {
         List<User> list = new ArrayList<>();
         list.add(new Admin("U1", "admin", "admin"));
         list.add(new WarehouseManager("U2", "wh_manager", "pass"));
@@ -85,7 +85,7 @@ public class DemoDataGenerator {
         return list;
     }
 
-    private static List<Order> generateOrders(int count, List<Supplier> suppliers, List<Warehouse> warehouses) {
+    public static List<Order> generateOrders(int count, List<Supplier> suppliers, List<Warehouse> warehouses) {
         List<Order> list = new ArrayList<>();
         OrderStatus[] statuses = OrderStatus.values();
         for (int i = 1; i <= count; i++) {
@@ -103,7 +103,7 @@ public class DemoDataGenerator {
         return list;
     }
 
-    private static List<Shipment> generateShipments(int count, List<Order> orders, List<Warehouse> warehouses) {
+    public static List<Shipment> generateShipments(int count, List<Order> orders, List<Warehouse> warehouses) {
         List<Shipment> list = new ArrayList<>();
         ShipmentStatus[] statuses = ShipmentStatus.values();
         for (int i = 1; i <= count; i++) {
@@ -122,7 +122,7 @@ public class DemoDataGenerator {
         return list;
     }
 
-    private static List<Driver> generateDrivers(int count) {
+    public static List<Driver> generateDrivers(int count) {
         List<Driver> list = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             list.add(new Driver("DRV" + i, "Driver Name " + i, "555-010" + i, rand.nextBoolean() ? DriverStatus.AVAILABLE : DriverStatus.ON_TRIP));
@@ -130,7 +130,7 @@ public class DemoDataGenerator {
         return list;
     }
 
-    private static List<SalesRecord> generateSalesRecords(int count, List<Product> products) {
+    public static List<SalesRecord> generateSalesRecords(int count, List<Product> products) {
         List<SalesRecord> list = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             String pid = "P" + String.format("%03d", rand.nextInt(products.size()) + 1);
@@ -139,7 +139,7 @@ public class DemoDataGenerator {
         return list;
     }
 
-    private static List<Route> generateRoutes(int count, List<Warehouse> warehouses) {
+    public static List<Route> generateRoutes(int count, List<Warehouse> warehouses) {
         List<Route> list = new ArrayList<>();
         for (int i = 1; i <= count; i++) {
             String w1 = "WH" + String.format("%02d", rand.nextInt(warehouses.size()) + 1);
