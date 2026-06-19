@@ -49,6 +49,28 @@ public class DataSeeder {
                 Logger.info("Seeding missing shipments data for charts...");
                 fm.saveShipments(DemoDataGenerator.generateShipments(50, fm.loadOrders(), fm.loadWarehouses()));
             }
+
+            // Self-healing: Check if routes are corrupted (referencing non-existent warehouses) due to the old bug
+            List<models.Route> routes = fm.loadRoutes();
+            List<Warehouse> whs = fm.loadWarehouses();
+            boolean routesCorrupted = false;
+            for (models.Route r : routes) {
+                boolean srcFound = false;
+                boolean destFound = false;
+                for (Warehouse w : whs) {
+                    if (w.getWarehouseId().equals(r.getSourceId())) srcFound = true;
+                    if (w.getWarehouseId().equals(r.getDestinationId())) destFound = true;
+                }
+                if (!srcFound || !destFound) {
+                    routesCorrupted = true;
+                    break;
+                }
+            }
+            
+            if (routesCorrupted || routes.isEmpty()) {
+                Logger.info("Corrupted or empty routes detected. Self-healing network graph...");
+                fm.saveRoutes(DemoDataGenerator.generateRoutes(50, whs));
+            }
         }
     }
 }
