@@ -6,7 +6,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileManager {
-    private static final String DATA_DIR = System.getenv().getOrDefault("STORAGE_PATH", "data") + (System.getenv().getOrDefault("STORAGE_PATH", "data").endsWith("/") ? "" : "/");
+    private static final String DATA_DIR;
+    private static final String REPORTS_DIR;
+
+    static {
+        // Handle being run from either project root or inside src/
+        if (new java.io.File("src/data").exists()) {
+            DATA_DIR = "src/data/";
+            REPORTS_DIR = "reports/";
+        } else if (new java.io.File("data").exists()) {
+            DATA_DIR = "data/";
+            REPORTS_DIR = "../reports/";
+        } else {
+            DATA_DIR = "src/data/"; // Fallback
+            REPORTS_DIR = "reports/";
+        }
+    }
+
     private static final String USERS_FILE = DATA_DIR + "users.txt";
     private static final String PRODUCTS_FILE = DATA_DIR + "products.txt";
     private static final String WAREHOUSES_FILE = DATA_DIR + "warehouses.txt";
@@ -22,7 +38,6 @@ public class FileManager {
     private static final String SALES_FILE = DATA_DIR + "sales.txt";
     private static final String ACTIVITIES_FILE = DATA_DIR + "activities.txt";
     private static final String NOTIFICATIONS_FILE = DATA_DIR + "notifications.txt";
-    private static final String REPORTS_DIR = "reports/";
 
     public FileManager() {
         File dir = new File(DATA_DIR);
