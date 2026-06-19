@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, Search, MapPin, Download, X } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { Plus, Search, MapPin, Download, Upload, X } from 'lucide-react';
 import api from '../services/api';
 import DataTable from '../components/DataTable';
 import { exportToCSV } from '../utils/export';
@@ -47,6 +47,52 @@ const Warehouses = () => {
     }
   };
 
+  const fileInputRef = useRef(null);
+  const [isImporting, setIsImporting] = useState(false);
+
+  const handleImportCSV = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    const reader = new FileReader();
+    reader.onload = async (event) => {
+      const text = event.target.result;
+      const lines = text.split('\n').filter(line => line.trim() !== '');
+      
+      let successCount = 0;
+      let failCount = 0;
+
+      // Skip header row if it exists (check if first line contains letters in ID column, or just try to parse all)
+      const startIndex = lines[0].toLowerCase().includes('id') || lines[0].toLowerCase().includes('name') ? 1 : 0;
+
+      for (let i = startIndex; i < lines.length; i++) {
+        const parts = lines[i].split(',').map(s => s.trim());
+        if (parts.length >= 4) {
+           const payload = {
+              warehouseId: parts[0],
+              warehouseName: parts[1],
+              location: parts[2],
+              capacity: parseInt(parts[3]) || 0
+           };
+           try {
+             await api.post('/warehouses', payload);
+             successCount++;
+           } catch (err) {
+             console.error("Failed to import row: ", lines[i]);
+             failCount++;
+           }
+        }
+      }
+      
+      alert(`Import complete! Successfully added ${successCount} warehouses. Failed: ${failCount}`);
+      setIsImporting(false);
+      if (fileInputRef.current) fileInputRef.current.value = ''; // Reset input
+      fetchWarehouses();
+    };
+    reader.readAsText(file);
+  };
+
   const columns = [
     { header: 'ID', accessor: 'warehouseId' },
     { header: 'Name', cell: (row) => <span className="font-medium text-slate-800 dark:text-slate-100">{row.warehouseName}</span> },
@@ -76,6 +122,21 @@ const Warehouses = () => {
           <p className="text-sm text-slate-500 mt-1">Manage locations, capacity, and assignments.</p>
         </div>
         <div className="flex space-x-3">
+          <input 
+            type="file" 
+            accept=".csv" 
+            ref={fileInputRef} 
+            onChange={handleImportCSV} 
+            className="hidden" 
+          />
+          <button 
+            onClick={() => fileInputRef.current?.click()}
+            disabled={isImporting}
+            className={`flex items-center px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm font-medium ${isImporting ? 'opacity-50 cursor-not-allowed' : ''}`}
+          >
+            <Upload size={18} className="mr-2" />
+            {isImporting ? 'Importing...' : 'Import CSV'}
+          </button>
           <button 
             onClick={() => exportToCSV(warehouses, 'Warehouses_Report')}
             className="flex items-center px-4 py-2 bg-white border border-slate-300 text-slate-700 rounded-lg hover:bg-slate-50 transition-colors shadow-sm font-medium"
