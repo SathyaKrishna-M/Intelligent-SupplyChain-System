@@ -58,8 +58,8 @@ public class DataSeeder {
                 boolean srcFound = false;
                 boolean destFound = false;
                 for (Warehouse w : whs) {
-                    if (w.getWarehouseId().equals(r.getSourceId())) srcFound = true;
-                    if (w.getWarehouseId().equals(r.getDestinationId())) destFound = true;
+                    if (w.getWarehouseId().equals(r.getSourceWarehouseId())) srcFound = true;
+                    if (w.getWarehouseId().equals(r.getDestinationWarehouseId())) destFound = true;
                 }
                 if (!srcFound || !destFound) {
                     routesCorrupted = true;
